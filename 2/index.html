@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script type="module">
+      import * as THREE from "three";
+      import { WebGPURenderer } from "three/webgpu";
+      const innerWidth = window.innerWidth;
+      const innerHeight = window.innerHeight;
+      /**
+       * 场景：场景是一个容器，用于存放场景中的所有对象
+       */
+      const scene = new THREE.Scene();
+      // 设置场景背景为深灰色 GL还是GPU渲染器都可以设置
+      scene.background = new THREE.Color(0x333333);
+      /**
+       * 几何体：几何体是场景中的基本对象，用于表示三维空间中的形状
+       * 这里我们创建一个立方体几何体，它的边长都是1
+       */
+      const geometry = new THREE.BoxGeometry(1, 1, 1);
+      // 材质 基本网格材质 不能使用渐变色，可以使用贴图或者   顶点颜色(给几何体的每一个顶点设置不同的颜色。Three.js 会自动在顶点之间进行插值，从而产生平滑的渐变)
+      // wireframe 线框模式
+      const material = new THREE.MeshBasicMaterial({
+        color: 0x00ff00,
+        wireframe: true,
+      });
+      // 网格    由两部分组成：几何体（Geometry）和材质（Material）
+      const mesh = new THREE.Mesh(geometry, material);
+      // 把网格添加到场景中
+      scene.add(mesh);
+
+      // 相机
+      // 参数：
+      // 1. 视野角度（FOV）：相机能够看到的垂直角度。
+      // 2. 宽高比（Aspect Ratio）：相机的宽度与高度的比例。
+      // 3. 近裁剪平面（Near Clip Plane）：相机能够看到的最近距离。
+      // 4. 远裁剪平面（Far Clip Plane）：相机能够看到的最远距离。
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        innerWidth / innerHeight,
+        0.1,
+        1000
+      );
+      // 相机默认位置是 (0, 0, 0)，我们需要将相机移动到 (0, 0, 5) 才能看到场景中的物体
+      camera.position.z = 5;
+      // camera.position.x = -1;
+      // 把相机添加到场景中
+      scene.add(camera);
+      // 渲染
+      // 渲染器：渲染器用于将场景中的对象渲染到屏幕上
+      const renderer = new WebGPURenderer();
+      //   const renderer = new THREE.WebGLRenderer();
+      // 设置渲染器的大小为窗口的大小
+      renderer.setSize(innerWidth, innerHeight);
+      // 把渲染器添加到 HTML 文档中
+      document.body.appendChild(renderer.domElement);
+      // 渲染场景
+      //   renderer.render(scene, camera); //使用 new THREE.WebGLRenderer() 用这个方式render
+      renderer.setAnimationLoop(() => {
+        renderer.render(scene, camera);
+      });
+    </script>
+  </body>
+</html>

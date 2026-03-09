@@ -17,21 +17,63 @@
       const scene = new THREE.Scene();
       // 设置场景背景为深灰色 GL还是GPU渲染器都可以设置
       scene.background = new THREE.Color(0x333333);
+
+      // 组 group,也可以用position设置位置
+      const group = new THREE.Group();
+      scene.add(group);
+
+      // 直接创建网格
+      const mesh = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 1, 1),
+        new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+      );
+      group.add(mesh);
+
       /**
        * 几何体：几何体是场景中的基本对象，用于表示三维空间中的形状
        * 这里我们创建一个立方体几何体，它的边长都是1
        */
-      const geometry = new THREE.BoxGeometry(1, 1, 1);
+      // const geometry = new THREE.BoxGeometry(1, 1, 1);
+
       // 材质 基本网格材质 不能使用渐变色，可以使用贴图或者   顶点颜色(给几何体的每一个顶点设置不同的颜色。Three.js 会自动在顶点之间进行插值，从而产生平滑的渐变)
       // wireframe 线框模式
-      const material = new THREE.MeshBasicMaterial({
-        color: 0x00ff00,
-        wireframe: true,
-      });
+      // const material = new THREE.MeshBasicMaterial({
+      //   color: 0x00ff00,
+      //   // wireframe: true,
+      // });
       // 网格    由两部分组成：几何体（Geometry）和材质（Material）
-      const mesh = new THREE.Mesh(geometry, material);
+      // const mesh = new THREE.Mesh(geometry, material);
+      // 修改位置
+      // mesh.position.x = 10;
+      // mesh.position.y = 1;
+      // mesh.position.z = 10;
+      // 同时修改x,y,z
+      // mesh.position.set(10, 10, 10);
+
+      // Scale 缩放
+      // 缩放网格 x轴缩放2倍，y轴缩放0.5倍，z轴缩放1倍  默认是1
+      mesh.scale.set(2, 0.5, 1);
+
+      // 旋转顺序  默认是XYZ
+      mesh.rotation.reorder("YXZ");
+      // 旋转
+      // 旋转网格  单位是弧度 x轴旋转90度,y轴旋转0度,z轴旋转0度
+      // x 在x轴上旋转，像烧烤架  Y在y轴上渲染，像蛋糕  Z在z轴上渲染，像盒子
+      mesh.rotation.set(Math.PI / 2, 0, Math.PI / 2);
+
+      // 轴辅助器  3表示轴的长度
+      const axisHelper = new THREE.AxesHelper(3);
+      // 把轴辅助器添加到场景中
+      scene.add(axisHelper);
+
       // 把网格添加到场景中
       scene.add(mesh);
+
+      // 归一化：将向量的长度设置为1（无论向量的原始长度是多少），方向保持不变
+      mesh.position.normalize();
+
+      // 查看网格的位置
+      // console.log(mesh.position.length());
 
       // 相机
       // 参数：
@@ -46,10 +88,18 @@
         1000
       );
       // 相机默认位置是 (0, 0, 0)，我们需要将相机移动到 (0, 0, 5) 才能看到场景中的物体
-      camera.position.z = 5;
+      // camera.position.z = 5;
+      camera.position.set(1, 1, 5);
       // camera.position.x = -1;
       // 把相机添加到场景中
       scene.add(camera);
+
+      // 相机注视网格 参数是Vector3类型的位置
+      camera.lookAt(new THREE.Vector3(1, 0, 1));
+
+      //  摄像机与网格的距离
+      console.log(mesh.position.distanceTo(camera.position));
+
       // 渲染
       // 渲染器：渲染器用于将场景中的对象渲染到屏幕上
       const renderer = new WebGPURenderer();

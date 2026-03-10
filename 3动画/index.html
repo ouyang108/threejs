@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script type="module">
+      import * as THREE from "three";
+      import { WebGPURenderer } from "three/webgpu";
+      import gsap from "gsap";
+
+      // import { Timer } from "three/c";
+      const innerWidth = window.innerWidth;
+      const innerHeight = window.innerHeight;
+      /**
+       * 场景：场景是一个容器，用于存放场景中的所有对象
+       */
+      const scene = new THREE.Scene();
+      // 设置场景背景为深灰色 GL还是GPU渲染器都可以设置
+      scene.background = new THREE.Color(0x333333);
+
+      // 组 group,也可以用position设置位置
+      const group = new THREE.Group();
+      scene.add(group);
+
+      // 直接创建网格
+      const mesh = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 1, 1),
+        new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
+      );
+      group.add(mesh);
+
+      // 轴辅助器  3表示轴的长度
+      const axisHelper = new THREE.AxesHelper(3);
+      // 把轴辅助器添加到场景中
+      scene.add(axisHelper);
+
+      // 把网格添加到场景中
+      scene.add(mesh);
+
+      // 查看网格的位置
+      // console.log(mesh.position.length());
+
+      // 相机
+      // 参数：
+      // 1. 视野角度（FOV）：相机能够看到的垂直角度。
+      // 2. 宽高比（Aspect Ratio）：相机的宽度与高度的比例。
+      // 3. 近裁剪平面（Near Clip Plane）：相机能够看到的最近距离。
+      // 4. 远裁剪平面（Far Clip Plane）：相机能够看到的最远距离。
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        innerWidth / innerHeight,
+        0.1,
+        1000,
+      );
+      // 相机默认位置是 (0, 0, 0)，我们需要将相机移动到 (0, 0, 5) 才能看到场景中的物体
+      // camera.position.z = 5;
+      camera.position.set(0, 0, 5);
+      // camera.position.x = -1;
+      // 把相机添加到场景中
+      scene.add(camera);
+
+      // 渲染
+      // 渲染器：渲染器用于将场景中的对象渲染到屏幕上
+      const renderer = new WebGPURenderer();
+      // const renderer = new THREE.WebGLRenderer();
+      // 设置渲染器的大小为窗口的大小
+      renderer.setSize(innerWidth, innerHeight);
+      // 把渲染器添加到 HTML 文档中
+      document.body.appendChild(renderer.domElement);
+
+      // 方块在 1 秒钟内转过的总角度是完全相同的。
+      // 但最好用performance.now()或者threejs的clock类来获取时间
+      // let time = Date.now();
+      // const clock = new THREE.Clock(); // 初始化
+      const timer = new THREE.Timer();
+      timer.connect(document);
+      // 渲染场景
+      // renderer.render(scene, camera); //使用 new THREE.WebGLRenderer() 用这个方式render
+      renderer.setAnimationLoop(() => {
+        // const currentTime = Date.now();
+        // const deltaTime = currentTime - time;
+        // time = currentTime;
+
+        // const deltaTime = clock.getElapsedTime();
+        // console.log(deltaTime);
+        timer.update();
+        const deltaTime = timer.getDelta();
+        // console.log(deltaTime);
+        // 方块在 1 秒钟内转过的总角度是 Math.PI * 2
+        mesh.rotation.x += Math.PI * 2 * deltaTime;
+        renderer.render(scene, camera);
+      });
+      // await renderer.init();
+      // 动画
+      // 动画循环：使用 requestAnimationFrame 实现动画循环
+      // function tick() {
+      //   // console.log("tick");
+      //   mesh.rotation.x += 0.01;
+      //   // 渲染场景
+      //   // renderer.render(scene, camera); //如果是这种方式渲染，renderer.render() 需要在 一直调用，因为只会渲染一次
+      //   requestAnimationFrame(tick);
+      // }
+      // tick();
+
+      gsap.to(mesh.rotation, {
+        x: Math.PI * 2,
+        duration: 1,
+        repeat: -1,
+        yoyo: true,
+      });
+    </script>
+  </body>
+</html>

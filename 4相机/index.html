@@ -1,17 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
   </head>
   <body>
     <script type="module">
       import * as THREE from "three";
       import { WebGPURenderer } from "three/webgpu";
       import gsap from "gsap";
-      const innerWidth = window.innerWidth;
-      const innerHeight = window.innerHeight;
+      import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+      let innerWidth = window.innerWidth;
+      let innerHeight = window.innerHeight;
+      console.log(OrbitControls);
       // cursor
       const cursor = {
         x: 0,
@@ -38,7 +47,7 @@
       // 直接创建网格
       const mesh = new THREE.Mesh(
         new THREE.BoxGeometry(1, 1, 1),
-        new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
+        new THREE.MeshBasicMaterial({ color: 0x00ff00 })
       );
       group.add(mesh);
 
@@ -46,9 +55,6 @@
       const axisHelper = new THREE.AxesHelper(3);
       // 把轴辅助器添加到场景中
       scene.add(axisHelper);
-
-      // 把网格添加到场景中
-      scene.add(mesh);
 
       // 查看网格的位置
       // console.log(mesh.position.length());
@@ -63,7 +69,7 @@
         75,
         innerWidth / innerHeight,
         0.1,
-        1000,
+        1000
       );
       // 正射相机 参数：left, right, top, bottom, near, far
       // const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
@@ -89,14 +95,21 @@
       // const clock = new THREE.Clock(); // 初始化
       const timer = new THREE.Timer();
       timer.connect(document);
+
+      // 轨道控制器
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true; // 开启阻尼效果
+      // controls.target.y = 2; // 相机轨道控制器的目标位置 设置完之后要update
+      controls.dampingFactor = 0.01;
       // 渲染场景
       // renderer.render(scene, camera); //使用 new THREE.WebGLRenderer() 用这个方式render
       renderer.setAnimationLoop(() => {
         // 更新摄像机位置
-        camera.position.x = cursor.x * 5;
-        camera.position.y = cursor.y * 5;
-        camera.lookAt(mesh.position);
-
+        // camera.position.x = Math.sin(cursor.x * Math.PI * 2) * 3;
+        // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 3;
+        // camera.position.y = Math.sin(cursor.y * Math.PI * 2) * 3;
+        // camera.lookAt(mesh.position);
+        controls.update();
         renderer.render(scene, camera);
       });
 
@@ -106,6 +119,21 @@
       //   repeat: -1,
       //   yoyo: true,
       // });
+      window.addEventListener("resize", () => {
+        // 1. 更新宽高
+        innerWidth = window.innerWidth;
+        innerHeight = window.innerHeight;
+
+        // 2. 更新相机的宽高比
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix(); // ✅ 必须调用
+
+        // 3. 更新渲染器尺寸
+        renderer.setSize(innerWidth, innerHeight);
+
+        // 4. （WebGPU 推荐）设置像素比，防止模糊
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      });
     </script>
   </body>
 </html>

@@ -130,9 +130,17 @@
 
         // 3. 更新渲染器尺寸
         renderer.setSize(innerWidth, innerHeight);
-
+        // requestFullscreen();
         // 4. （WebGPU 推荐）设置像素比，防止模糊
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      });
+      window.addEventListener("dblclick", () => {
+        //可能会有兼容性问题，但此时我们不考虑
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          renderer.domElement.requestFullscreen();
+        }
       });
     </script>
   </body>

@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import * as THREE from "three";
+      import { WebGPURenderer } from "three/webgpu";
+      import gsap from "gsap";
+      import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+      let innerWidth = window.innerWidth;
+      let innerHeight = window.innerHeight;
+      console.log(OrbitControls);
+      // cursor
+      const cursor = {
+        x: 0,
+        y: 0,
+      };
+      window.addEventListener("mousemove", (e) => {
+        cursor.x = e.clientX / innerWidth - 0.5;
+        cursor.y = -(e.clientY / innerHeight - 0.5);
+      });
+
+      // import { Timer } from "three/c";
+
+      /**
+       * 场景：场景是一个容器，用于存放场景中的所有对象
+       */
+      const scene = new THREE.Scene();
+      // 设置场景背景为深灰色 GL还是GPU渲染器都可以设置
+      scene.background = new THREE.Color(0x333333);
+
+      // 组 group,也可以用position设置位置
+      const group = new THREE.Group();
+      scene.add(group);
+      // 数组长度为9
+      // const positionsArray = new Float32Array(9);
+      // // 每个元素都是一个坐标值，x, y, z 分别表示物体在三个方向上的位置
+      // positionsArray[0] = 0;
+      // positionsArray[1] = 0;
+      // positionsArray[2] = 0;
+
+      // positionsArray[3] = 0;
+      // positionsArray[4] = 1;
+      // positionsArray[5] = 0;
+
+      // positionsArray[6] = 1;
+      // positionsArray[7] = 0;
+      // positionsArray[8] = 0;
+
+      //#start 创造出原本threejs里面没有的方块
+      const positionsArray = new Float32Array([
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        // 第二个三角形 (右上半部分)
+        1,
+        0,
+        0, // 点4 (其实和点2重合)
+        1,
+        1,
+        0, // 点5
+        0,
+        1,
+        0, // 点6 (其实和点3重合)
+      ]);
+      // 每个元素都是一个坐标值，x, y, z 分别表示物体在三个方向上的位置
+      // 3 表示每个顶点有 3 个坐标值，分别是 x, y, z
+      const positionAttribute = new THREE.BufferAttribute(positionsArray, 3);
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", positionAttribute);
+      // #end
+      // 直接创建网格
+      const mesh = new THREE.Mesh(
+        // 几何体：几何体定义了物体的形状，比如立方体、球体等
+        // 后面三个参数：widthSegments, heightSegments, depthSegments  分别表示几何体在宽度、高度、深度方向上的分割数
+        // new THREE.BoxGeometry(1, 1, 1, 2, 2, 2),
+        geometry,
+        // 材质：材质定义了物体的外观，比如颜色、纹理等
+        new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true }),
+      );
+      group.add(mesh);
+
+      // 轴辅助器  3表示轴的长度
+      const axisHelper = new THREE.AxesHelper(3);
+      // 把轴辅助器添加到场景中
+      scene.add(axisHelper);
+
+      // 查看网格的位置
+      // console.log(mesh.position.length());
+
+      // 相机
+      // 参数：
+      // 1. 视野角度（FOV）：相机能够看到的垂直角度。
+      // 2. 宽高比（Aspect Ratio）：相机的宽度与高度的比例。
+      // 3. 近裁剪平面（Near Clip Plane）：相机能够看到的最近距离。 如果物体距离相机小于Near Clip Plane，那么物体就不会被渲染。
+      // 4. 远裁剪平面（Far Clip Plane）：相机能够看到的最远距离。 如果物体距离相机大于Far Clip Plane，那么物体就不会被渲染。
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        innerWidth / innerHeight,
+        0.1,
+        1000,
+      );
+      // 正射相机 参数：left, right, top, bottom, near, far
+      // const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
+      // 相机默认位置是 (0, 0, 0)，我们需要将相机移动到 (0, 0, 5) 才能看到场景中的物体
+      // camera.position.z = 5;
+      camera.position.set(0, 0, 5);
+      // camera.position.x = -1;
+      // 把相机添加到场景中
+      scene.add(camera);
+
+      // 渲染
+      // 渲染器：渲染器用于将场景中的对象渲染到屏幕上
+      const renderer = new WebGPURenderer();
+      // const renderer = new THREE.WebGLRenderer();
+      // 设置渲染器的大小为窗口的大小
+      renderer.setSize(innerWidth, innerHeight);
+      // 把渲染器添加到 HTML 文档中
+      document.body.appendChild(renderer.domElement);
+
+      // 方块在 1 秒钟内转过的总角度是完全相同的。
+      // 但最好用performance.now()或者threejs的clock类来获取时间
+      // let time = Date.now();
+      // const clock = new THREE.Clock(); // 初始化
+      const timer = new THREE.Timer();
+      timer.connect(document);
+
+      // 轨道控制器
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true; // 开启阻尼效果
+      // controls.target.y = 2; // 相机轨道控制器的目标位置 设置完之后要update
+      controls.dampingFactor = 0.01;
+      // 渲染场景
+      // renderer.render(scene, camera); //使用 new THREE.WebGLRenderer() 用这个方式render
+      renderer.setAnimationLoop(() => {
+        // 更新摄像机位置
+        // camera.position.x = Math.sin(cursor.x * Math.PI * 2) * 3;
+        // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 3;
+        // camera.position.y = Math.sin(cursor.y * Math.PI * 2) * 3;
+        // camera.lookAt(mesh.position);
+        controls.update();
+        renderer.render(scene, camera);
+      });
+
+      // gsap.to(mesh.rotation, {
+      //   x: Math.PI * 2,
+      //   duration: 1,
+      //   repeat: -1,
+      //   yoyo: true,
+      // });
+      window.addEventListener("resize", () => {
+        // 1. 更新宽高
+        innerWidth = window.innerWidth;
+        innerHeight = window.innerHeight;
+
+        // 2. 更新相机的宽高比
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix(); // ✅ 必须调用
+
+        // 3. 更新渲染器尺寸
+        renderer.setSize(innerWidth, innerHeight);
+        // requestFullscreen();
+        // 4. （WebGPU 推荐）设置像素比，防止模糊
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      });
+      window.addEventListener("dblclick", () => {
+        //可能会有兼容性问题，但此时我们不考虑
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          renderer.domElement.requestFullscreen();
+        }
+      });
+    </script>
+  </body>
+</html>

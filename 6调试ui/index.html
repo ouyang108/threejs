@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -44,49 +44,6 @@
       // 组 group,也可以用position设置位置
       const group = new THREE.Group();
       scene.add(group);
-      // 数组长度为9
-      // const positionsArray = new Float32Array(9);
-      // // 每个元素都是一个坐标值，x, y, z 分别表示物体在三个方向上的位置
-      // positionsArray[0] = 0;
-      // positionsArray[1] = 0;
-      // positionsArray[2] = 0;
-
-      // positionsArray[3] = 0;
-      // positionsArray[4] = 1;
-      // positionsArray[5] = 0;
-
-      // positionsArray[6] = 1;
-      // positionsArray[7] = 0;
-      // positionsArray[8] = 0;
-
-      //#start 创造出原本threejs里面没有的方块
-      // const positionsArray = new Float32Array([
-      //   0,
-      //   0,
-      //   0,
-      //   0,
-      //   1,
-      //   0,
-      //   1,
-      //   0,
-      //   0,
-      //   // 第二个三角形 (右上半部分)
-      //   1,
-      //   0,
-      //   0, // 点4 (其实和点2重合)
-      //   1,
-      //   1,
-      //   0, // 点5
-      //   0,
-      //   1,
-      //   0, // 点6 (其实和点3重合)
-      // ]);
-      // 每个元素都是一个坐标值，x, y, z 分别表示物体在三个方向上的位置
-      // 3 表示每个顶点有 3 个坐标值，分别是 x, y, z
-      // const positionAttribute = new THREE.BufferAttribute(positionsArray, 3);
-      // const geometry = new THREE.BufferGeometry();
-      // geometry.setAttribute("position", positionAttribute);
-      // #end
       // 直接创建网格
       const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
       const mesh = new THREE.Mesh(
@@ -95,7 +52,7 @@
         new THREE.BoxGeometry(1, 1, 1, 2, 2, 2),
         // geometry,
         // 材质：材质定义了物体的外观，比如颜色、纹理等
-        material
+        material,
       );
       group.add(mesh);
 
@@ -117,7 +74,7 @@
         75,
         innerWidth / innerHeight,
         0.1,
-        1000
+        1000,
       );
       // 正射相机 参数：left, right, top, bottom, near, far
       // const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
@@ -152,11 +109,6 @@
       // 渲染场景
       // renderer.render(scene, camera); //使用 new THREE.WebGLRenderer() 用这个方式render
       renderer.setAnimationLoop(() => {
-        // 更新摄像机位置
-        // camera.position.x = Math.sin(cursor.x * Math.PI * 2) * 3;
-        // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 3;
-        // camera.position.y = Math.sin(cursor.y * Math.PI * 2) * 3;
-        // camera.lookAt(mesh.position);
         controls.update();
         renderer.render(scene, camera);
       });

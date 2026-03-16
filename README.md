@@ -31,3 +31,7 @@ renderer.render(scene, camera);
         new THREE.MeshBasicMaterial({ color: 0x00ff00 })
       );
       group.add(mesh);
+
+
+### 字体
+1. 字体转换：https://gero3.github.io/facetype.js/

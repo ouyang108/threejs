@@ -48,6 +48,6 @@ alphaMap（阿尔法贴图）是用来控制物体“透明度分布”的一张
 
 ### 材质 ：Material
  MeshBasicMaterial:基本网格材质 不受到光照影响
-
+材质球：https://github.com/nidorx/matcaps
 ### 字体
 1. 字体转换：https://gero3.github.io/facetype.js/

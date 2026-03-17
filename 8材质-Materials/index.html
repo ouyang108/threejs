@@ -22,12 +22,11 @@
       import color from "./static/textures/door/color.jpg";
       import matcap2 from "./static/textures/matcaps/2.png";
       import alphaMap from "./static/textures/door/alpha.jpg";
-      /**
-       * MeshBasicMaterial:基本网格材质 不受到光照影响
-       *
-       *
-       * */
-
+      // 光源 参数：1. 颜色 2. 强度
+      const ambientLight = new THREE.AmbientLight(0xffffff, 100);
+      // 点光源
+      const pointLight = new THREE.PointLight(0xffffff, 100);
+      pointLight.position.set(2, 3, 4);
       let innerWidth = window.innerWidth;
       let innerHeight = window.innerHeight;
       const gui = new GUI();
@@ -53,6 +52,8 @@
       // 组 group,也可以用position设置位置
       const group = new THREE.Group();
       scene.add(group);
+      // scene.add(ambientLight);
+      scene.add(pointLight);
       // 纹理是贴在材质上的
       // 直接创建网格
       const material = new THREE.MeshBasicMaterial({
@@ -118,7 +119,41 @@
       // torus.material.color = new THREE.Color(0xff0000);
 
       torus.position.x = 3;
-      group.add(plane, mesh, torus);
+
+      // mesgNormalMaterail: 网格法线材质，颜色根据法线方向变化
+      const newGemo = new THREE.Mesh(
+        new THREE.TorusGeometry(1, 0.5, 10, 100),
+        new THREE.MeshNormalMaterial({
+          wireframe: true,
+        }),
+      );
+      newGemo.position.x = -3;
+      // group.add(plane, mesh, torus, newGemo);
+
+      const newGemotwo = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 16, 16),
+        // MeshMatcapMaterial: 网格Matcap材质，使用Matcap纹理来渲染物体的表面，Matcap纹理是一种特殊的纹理，它包含了物体表面的光照信息，可以用来模拟复杂的光照效果，而不需要计算实时的光照。
+        new THREE.MeshMatcapMaterial({
+          // wireframe: true,
+          matcap: new THREE.TextureLoader().load(
+            "./static/textures/matcaps/2.png",
+          ),
+        }),
+      );
+      // 对光源有反应的材质
+      const newGemothree = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 16, 16),
+        // new THREE.MeshLambertMaterial(),
+        // 有反光效果的材质
+        // new THREE.MeshPhongMaterial({
+        //   shininess: 1000,
+        //   // 高光的颜色
+        //   specular: new THREE.Color(0xff0000),
+        // }),
+        new THREE.MeshToonMaterial({}),
+      );
+      group.add(newGemothree);
+      // group.add(newGemo, newGemotwo);
 
       // 轴辅助器  3表示轴的长度
       const axisHelper = new THREE.AxesHelper(3);

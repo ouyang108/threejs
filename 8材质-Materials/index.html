@@ -53,7 +53,7 @@
       // 组 group,也可以用position设置位置
       const group = new THREE.Group();
       scene.add(group);
-      // scene.add(ambientLight);
+      scene.add(ambientLight);
       scene.add(pointLight);
       // 纹理是贴在材质上的
       // 直接创建网格
@@ -143,6 +143,15 @@
       );
 
       const textureLoader = new THREE.TextureLoader();
+      const cubeTextureLoader = new THREE.CubeTextureLoader();
+      const environmentMap = cubeTextureLoader.load([
+        "./static/textures/environmentMaps/px.jpg",
+        "./static/textures/environmentMaps/nx.jpg",
+        "./static/textures/environmentMaps/py.jpg",
+        "./static/textures/environmentMaps/ny.jpg",
+        "./static/textures/environmentMaps/pz.jpg",
+        "./static/textures/environmentMaps/nz.jpg",
+      ]);
       const matcapTexture = textureLoader.load(
         "./static/textures/matcaps/2.png ",
       );
@@ -165,15 +174,19 @@
         // }),
         // 标准材质 MeshStandardMaterial: 网格标准材质，基于物理的渲染（PBR）材质，能够模拟真实世界中的各种材质效果，比如金属、塑料等。它支持环境光遮蔽（AO）、金属度（Metalness）和粗糙度（Roughness）等属性，可以创建出非常逼真的材质效果。
         new THREE.MeshStandardMaterial({
-          aoMap: textureLoader.load(door),
-          metalness: 1, // 金属度，范围从 0 到 1，值越高表示材质越像金属
-          roughness: 1, // 粗糙度，范围从 0 到 1，值越高表示材质表面越粗糙
+          envMap: environmentMap,
+          metalness: 0.7, // 金属度，范围从 0 到 1，值越高表示材质越像金属
+          roughness: 0.2, // 粗糙度，范围从 0 到 1，值越高表示材质表面越粗糙
         }),
       );
       newGemothree.geometry.setAttribute(
         "uv2",
         new THREE.BufferAttribute(newGemothree.geometry.attributes.uv.array, 2),
       );
+      // newGemothree.geometry.setAttribute(
+      //   "uv2",
+      //   new THREE.BufferAttribute(newGemothree.geometry.attributes.uv.array, 2),
+      // );
       group.add(newGemothree);
       // group.add(newGemo, newGemotwo);
 

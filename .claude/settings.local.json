@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find 8材质-Materials/static/textures -type f -name *.png -o -name *.jpg)"
+    ]
+  }
+}

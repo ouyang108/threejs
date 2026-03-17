@@ -31,3 +31,20 @@ renderer.render(scene, camera);
         new THREE.MeshBasicMaterial({ color: 0x00ff00 })
       );
       group.add(mesh);
+
+### 纹理
+大小使用更小的图片可以提高渲染效率
+使用2的幂次方图片可以提高渲染效率
+纹理网站：
+ poliigon.com
+ 3dtextures.me
+ arroway-textures.ch
+纹理能和颜色混合
+
+alphaMap（阿尔法贴图）是用来控制物体“透明度分布”的一张黑白贴图。
+物体的哪些部分是可见的，哪些部分是透明的，取决于alphaMap贴图上的颜色。
+白色部分是可见的，黑色部分是透明的。
+
+
+### 材质 ：Material
+ MeshBasicMaterial:基本网格材质 不受到光照影响

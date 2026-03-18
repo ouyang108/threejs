@@ -24,9 +24,9 @@
       import alphaMap from "./static/textures/door/alpha.jpg";
       import door from "./static/textures/door/ambientOcclusion.jpg";
       // 光源 参数：1. 颜色 2. 强度
-      const ambientLight = new THREE.AmbientLight(0xffffff, 100);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
       // 点光源
-      const pointLight = new THREE.PointLight(0xffffff, 100);
+      const pointLight = new THREE.PointLight(0xffffff, 0.5);
       pointLight.position.set(2, 3, 4);
       let innerWidth = window.innerWidth;
       let innerHeight = window.innerHeight;
@@ -144,14 +144,26 @@
 
       const textureLoader = new THREE.TextureLoader();
       const cubeTextureLoader = new THREE.CubeTextureLoader();
-      const environmentMap = cubeTextureLoader.load([
-        "./static/textures/environmentMaps/px.jpg",
-        "./static/textures/environmentMaps/nx.jpg",
-        "./static/textures/environmentMaps/py.jpg",
-        "./static/textures/environmentMaps/ny.jpg",
-        "./static/textures/environmentMaps/pz.jpg",
-        "./static/textures/environmentMaps/nz.jpg",
-      ]);
+      const environmentMap = cubeTextureLoader.load(
+        [
+          "./static/textures/environmentMap/px.png",
+          "./static/textures/environmentMap/nx.png",
+          "./static/textures/environmentMap/py.png",
+          "./static/textures/environmentMap/ny.png",
+          "./static/textures/environmentMap/pz.png",
+          "./static/textures/environmentMap/nz.png",
+        ],
+        (texture) => {
+          console.log("加载成功！");
+        },
+        (xhr) => {
+          console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+        },
+        (error) => {
+          console.error("出错了！找不到图片：", error);
+        },
+      ); // 在这里捕获报错);
+      console.log(environmentMap, "environmentMap");
       const matcapTexture = textureLoader.load(
         "./static/textures/matcaps/2.png ",
       );

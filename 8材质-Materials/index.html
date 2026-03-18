@@ -304,7 +304,9 @@
 
       gui.add(newGemothree.material, "metalness", 0, 1, 0.01).name("金属度");
       gui.add(newGemothree.material, "roughness", 0, 1, 0.01).name("粗糙度");
-
+      gui.add(camera.position, "x", -10, 10, 0.01).name("相机X");
+      gui.add(camera.position, "y", -10, 10, 0.01).name("相机Y");
+      gui.add(camera.position, "z", -10, 10, 0.01).name("相机Z");
       gui.open();
 
       function spin() {

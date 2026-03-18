@@ -45,6 +45,10 @@
       const scene = new THREE.Scene();
       // 设置场景背景为深灰色 GL还是GPU渲染器都可以设置
       scene.background = new THREE.Color(0x333333);
+      const texture = textureLoader.load("./static/textures/matcaps/2.png");
+      const material = new THREE.MeshMatcapMaterial({
+        matcap: texture,
+      });
 
       const fontLoader = new FontLoader();
       fontLoader.load("static/helvetiker_regular.typeface.json", (font) => {
@@ -59,34 +63,37 @@
         textResult.center();
         textResult.computeBoundingBox();
         console.log(textResult.boundingBox);
-        const text = new THREE.Mesh(textResult, textMesh);
+        const text = new THREE.Mesh(textResult, material);
 
         scene.add(text);
+
+        console.time("donut");
+        // 优化
+        // 参数：半径，管道半径，径向分段数，管道分段数
+        const donutGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45);
+
+        for (let i = 0; i < 500; i++) {
+          const donut = new THREE.Mesh(donutGeometry, material);
+          donut.position.x = (Math.random() - 0.5) * 10;
+          donut.position.y = (Math.random() - 0.5) * 10;
+          donut.position.z = (Math.random() - 0.5) * 10;
+          donut.rotation.x = Math.random() * Math.PI;
+          donut.rotation.y = Math.random() * Math.PI;
+          const scale = Math.random();
+          donut.scale.set(scale, scale, scale);
+          scene.add(donut);
+        }
+        console.timeEnd("donut");
       });
 
       // 组 group,也可以用position设置位置
       const group = new THREE.Group();
       scene.add(group);
 
-      const material = new THREE.MeshBasicMaterial({
-        color: 0x00ff00,
-        //虚线
-        // wireframe: true,
-      });
-      const mesh = new THREE.Mesh(
-        // 几何体：几何体定义了物体的形状，比如立方体、球体等
-        // 后面三个参数：widthSegments, heightSegments, depthSegments  分别表示几何体在宽度、高度、深度方向上的分割数
-        new THREE.BoxGeometry(1, 1, 1, 2, 2, 2),
-        // geometry,
-        // 材质：材质定义了物体的外观，比如颜色、纹理等
-        material,
-      );
-      // group.add(mesh);
-
       // 轴辅助器  3表示轴的长度
       const axisHelper = new THREE.AxesHelper(3);
       // 把轴辅助器添加到场景中
-      scene.add(axisHelper);
+      // scene.add(axisHelper);
 
       // 查看网格的位置
       // console.log(mesh.position.length());
@@ -179,21 +186,14 @@
 
       // const cubeFolder = gui.addFolder("Cube");
 
-      // y 轴 垂直高度 范围 -3 到 3  步长 0.01
-      gui.add(mesh.position, "y", -3, 3, 0.01).name("垂直高度");
-      // 颜色 material: 材质
-      gui.addColor(material, "color").name("颜色");
-      // material.color.set("red");
-      gui
-        .add(mesh, "visible")
-        .name("是否可见")
-        .onChange((e) => {
-          console.log("是否可见", e);
-        });
-      gui.add(material, "wireframe").name("是否线框");
-      // 自定义方法
-      gui.add(params, "spin").name("旋转");
-      gui.open();
+      // // 颜色 material: 材质
+      // gui.addColor(material, "color").name("颜色");
+      // // material.color.set("red");
+
+      // gui.add(material, "wireframe").name("是否线框");
+      // // 自定义方法
+      // gui.add(params, "spin").name("旋转");
+      // gui.open();
 
       function spin() {
         gsap.to(mesh.rotation, {

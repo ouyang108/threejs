@@ -51,3 +51,8 @@ alphaMap（阿尔法贴图）是用来控制物体“透明度分布”的一张
 材质球：https://github.com/nidorx/matcaps
 ### 字体
 1. 字体转换：https://gero3.github.io/facetype.js/
+
+### 灯光
+环境光：AmbientLight 
+半球光：HemisphereLight  
+上面两个耗性能都比较低

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import * as THREE from "three";
+      import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+      import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+      import gsap from "gsap";
+      let innerWidth = window.innerWidth;
+      let innerHeight = window.innerHeight;
+      const gui = new GUI();
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        innerWidth / innerHeight,
+        0.1,
+        1000,
+      );
+
+      camera.position.set(0, 0, 5);
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(innerWidth, innerHeight);
+      // 开启阴影
+      renderer.shadowMap.enabled = true;
+      document.body.appendChild(renderer.domElement);
+
+      // 设置光源
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // 环境光，颜色为白色，强度为0.5
+      scene.add(ambientLight);
+      // 点光
+      const pointLight = new THREE.PointLight(0xffffff, 10); // 点光，颜色为白色，强度为1
+      pointLight.position.set(2, 3, 4); // 设置点光的位置
+      pointLight.castShadow = true; // 开启点光的阴影
+      scene.add(pointLight);
+      console.log(pointLight.shadow);
+      // pointLight.shadow.mapSize.width = 1024; // 设置阴影贴图的宽度
+      // pointLight.shadow.mapSize.height = 1024; // 设置阴影贴图的高度  阴影的分辨率
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true; // 开启阻尼效果
+      // controls.target.y = 2; // 相机轨道控制器的目标位置 设置完之后要update
+      controls.dampingFactor = 0.01;
+
+      // 材质
+      const material = new THREE.MeshStandardMaterial({
+        roughness: 0.4, // 粗糙度，范围从 0 到 1，值越高表示材质表面越粗糙
+      });
+
+      // 对光源有反应的材质
+      const newGemothree = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 16, 16),
+        material,
+      );
+      // 开启投射阴影
+      newGemothree.castShadow = true;
+      // 平面
+      const plane = new THREE.Mesh(
+        new THREE.PlaneGeometry(10, 10),
+        new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+          side: THREE.DoubleSide,
+        }),
+      );
+      plane.receiveShadow = true; // 开启接收阴影
+      plane.rotation.x = -Math.PI / 2; // 将平面旋转90度
+      plane.position.y = -2; // 将平面向下移动，使其位于球体下方
+      scene.add(plane);
+      // 轴辅助器  3表示轴的长度
+      const axisHelper = new THREE.AxesHelper(3);
+      // 把轴辅助器添加到场景中
+      scene.add(axisHelper);
+
+      scene.add(newGemothree);
+      const timer = new THREE.Timer();
+      renderer.setAnimationLoop(() => {
+        controls.update();
+        timer.update();
+
+        renderer.render(scene, camera);
+      });
+
+      window.addEventListener("resize", () => {
+        // 1. 更新宽高
+        innerWidth = window.innerWidth;
+        innerHeight = window.innerHeight;
+
+        // 2. 更新相机的宽高比
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix(); // ✅ 必须调用
+
+        // 3. 更新渲染器尺寸
+        renderer.setSize(innerWidth, innerHeight);
+        // requestFullscreen();
+        // 4. （WebGPU 推荐）设置像素比，防止模糊
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      });
+      // gsap.to(newGemothree.position, {
+      //   x: 3, // 目标位置：沿着 X 轴移动到 5
+      //   duration: 2, // 动画持续时间：2 秒
+      //   ease: "power1.inOut", // 缓动函数：两头慢中间快，看起来更自然
+      //   repeat: -1, // 无限循环：-1 表示永久重复
+      //   yoyo: true, // 关键：往返运动（移动到 5 后再回到原位）
+      // });
+      gui.add(pointLight, "intensity", 0, 100, 1).name("点光强度");
+      // gui.open()
+    </script>
+  </body>
+</html>

@@ -56,3 +56,14 @@ alphaMap（阿尔法贴图）是用来控制物体“透明度分布”的一张
 环境光：AmbientLight 
 半球光：HemisphereLight  
 上面两个耗性能都比较低
+
+### 阴影
+开启阴影：renderer.shadowMap.enabled = true;
+开启投射阴影：mesh.castShadow = true; mesh是网格对象
+开启接收阴影：plane.receiveShadow = true; 接收阴影的平面
+开启灯光阴影：light.castShadow = true; light是灯光对象
+只有三种灯光可以投射阴影：
+1. 点光：PointLight
+2. 聚光灯：SpotLight
+3. 方向光：DirectionalLight
+接收阴影和投射阴影的材质 都必须要可以被光照影响，否则不会显示阴影

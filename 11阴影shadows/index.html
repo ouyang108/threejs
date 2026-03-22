@@ -44,8 +44,11 @@
       const pointLight = new THREE.PointLight(0xffffff, 10); // 点光，颜色为白色，强度为1
       pointLight.position.set(2, 3, 4); // 设置点光的位置
       pointLight.castShadow = true; // 开启点光的阴影
+      // pointLight.shadow.type = THREE.PCFShadowMap; // 开启有阴影算法
       scene.add(pointLight);
-      console.log(pointLight.shadow);
+
+      const pointerCamera = new THREE.CameraHelper(pointLight.shadow.camera);
+      scene.add(pointerCamera);
       // pointLight.shadow.mapSize.width = 1024; // 设置阴影贴图的宽度
       // pointLight.shadow.mapSize.height = 1024; // 设置阴影贴图的高度  阴影的分辨率
       const controls = new OrbitControls(camera, renderer.domElement);
@@ -106,6 +109,7 @@
         // 4. （WebGPU 推荐）设置像素比，防止模糊
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       });
+      renderer.shadowMap.type = THREE.PointLightShadow; // 开启软阴影算法
       // gsap.to(newGemothree.position, {
       //   x: 3, // 目标位置：沿着 X 轴移动到 5
       //   duration: 2, // 动画持续时间：2 秒

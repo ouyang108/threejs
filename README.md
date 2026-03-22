@@ -67,3 +67,7 @@ alphaMap（阿尔法贴图）是用来控制物体“透明度分布”的一张
 2. 聚光灯：SpotLight
 3. 方向光：DirectionalLight
 接收阴影和投射阴影的材质 都必须要可以被光照影响，否则不会显示阴影
+阴影算法：
+ 1. 无阴影算法：BasicShadowMap 性能高
+ 2. 有阴影算法：PCFShadowMap 默认
+ 

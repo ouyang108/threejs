@@ -60,7 +60,7 @@
       spotLight.position.set(0, 5, 0); // 设置聚光灯的位置
       scene.add(spotLight);
       scene.add(spotLight.target); // 把聚光灯的目标添加到场景中
-      spotLight.target.position.set(0, 0, 0); // 设置聚光灯的目标位置
+      spotLight.target.position.set(0, 0, 0); // 设置聚光灯的目标位置  如果你不把 target 放入场景，你就无法通过改变坐标来控制手电筒指向哪里 这个“方向”，是由聚光灯的 target（目标点） 决定的
 
       const controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true; // 开启阻尼效果

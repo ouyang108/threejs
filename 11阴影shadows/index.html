@@ -20,6 +20,12 @@
       import gsap from "gsap";
       let innerWidth = window.innerWidth;
       let innerHeight = window.innerHeight;
+
+      // textures 纹理
+      const textureLoader = new THREE.TextureLoader();
+      const texture = textureLoader.load("./static/bakedShadow.jpg");
+      const simple = textureLoader.load("./static/simpleShadow.jpg");
+
       const gui = new GUI();
 
       const scene = new THREE.Scene();
@@ -43,7 +49,10 @@
       // 点光
       const pointLight = new THREE.PointLight(0xffffff, 10); // 点光，颜色为白色，强度为1
       pointLight.position.set(2, 3, 4); // 设置点光的位置
-      pointLight.castShadow = true; // 开启点光的阴影
+      pointLight.castShadow = false; // 开启点光的阴影
+      // setTimeout(() => {
+      //   pointLight.castShadow = true; // 开启点光的阴影
+      // }, 2000);
       // pointLight.shadow.type = THREE.PCFShadowMap; // 开启有阴影算法
       scene.add(pointLight);
 
@@ -71,11 +80,29 @@
       // 平面
       const plane = new THREE.Mesh(
         new THREE.PlaneGeometry(10, 10),
-        new THREE.MeshStandardMaterial({
-          color: 0xffffff,
+        // new THREE.MeshStandardMaterial({
+        //   color: 0xffffff,
+        //   side: THREE.DoubleSide,
+        // }),
+        // 烘焙阴影贴图
+        // new THREE.MeshBasicMaterial({
+        //   map: texture,
+        // }),
+      );
+      const sphereShadow = new THREE.Mesh(
+        new THREE.PlaneGeometry(5, 5),
+        new THREE.MeshBasicMaterial({
+          // map: simple,
+          color: 0x000000,
+          alphaMap: simple,
+          transparent: true,
+          // 双面
           side: THREE.DoubleSide,
         }),
       );
+      sphereShadow.rotation.x = -Math.PI / 2;
+      sphereShadow.position.y = -1.5;
+      scene.add(sphereShadow);
       plane.receiveShadow = true; // 开启接收阴影
       plane.rotation.x = -Math.PI / 2; // 将平面旋转90度
       plane.position.y = -2; // 将平面向下移动，使其位于球体下方
@@ -86,11 +113,13 @@
       scene.add(axisHelper);
 
       scene.add(newGemothree);
+
       const timer = new THREE.Timer();
       renderer.setAnimationLoop(() => {
         controls.update();
         timer.update();
-
+        sphereShadow.position.x = newGemothree.position.x;
+        sphereShadow.position.z = newGemothree.position.z;
         renderer.render(scene, camera);
       });
 
@@ -110,15 +139,21 @@
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       });
       renderer.shadowMap.type = THREE.PointLightShadow; // 开启软阴影算法
-      // gsap.to(newGemothree.position, {
-      //   x: 3, // 目标位置：沿着 X 轴移动到 5
-      //   duration: 2, // 动画持续时间：2 秒
-      //   ease: "power1.inOut", // 缓动函数：两头慢中间快，看起来更自然
-      //   repeat: -1, // 无限循环：-1 表示永久重复
-      //   yoyo: true, // 关键：往返运动（移动到 5 后再回到原位）
-      // });
+      // renderer.shadowMap.autoUpdate = false; // 关闭自动更新阴影贴图
+      // setTimeout(() => {
+      //   renderer.shadowMap.autoUpdate = true; // 开启自动更新阴影贴图
+      // }, 2000);
+      gsap.to(newGemothree.position, {
+        x: 3, // 目标位置：沿着 X 轴移动到 5
+        duration: 2, // 动画持续时间：2 秒
+        ease: "power1.inOut", // 缓动函数：两头慢中间快，看起来更自然
+        repeat: -1, // 无限循环：-1 表示永久重复
+        yoyo: true, // 关键：往返运动（移动到 5 后再回到原位）
+      });
       gui.add(pointLight, "intensity", 0, 100, 1).name("点光强度");
       // gui.open()
+
+      // 推荐用renderer.shadowMap.autoUpdate = false
     </script>
   </body>
 </html>
